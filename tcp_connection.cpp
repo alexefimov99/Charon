@@ -1,9 +1,5 @@
 #include "tcp_connection.h"
 
-namespace {
-    constexpr auto max_package_size{1024};
-} // namespace
-
 void TcpConnection::Observer::onReceived([[maybe_unused]] int connection_id,
                                          [[maybe_unused]] const char* data,
                                          [[maybe_unused]] const size_t length) {
@@ -55,7 +51,7 @@ void TcpConnection::close() {
 void TcpConnection::read() {
     is_reading_ = true;
 
-    auto buffers = read_buffer_.prepare(max_package_size);
+    auto buffers = read_buffer_.prepare(MAX_PACKAGE_SIZE);
     auto self = shared_from_this();
 
     socket_.async_read_some(buffers, [this, self] (const bsys::error_code& error, const size_t bytes_transferred) {

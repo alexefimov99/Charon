@@ -16,7 +16,7 @@ TcpServer::TcpServer(basio::io_context &io_context, Observer &observer)
       connection_count_{0}, is_accepted_{false}, is_closed_{false} {
 }
 
-bool TcpServer::listen(const basio_tcp &protocol, short port) {
+bool TcpServer::listen(const basio_tcp &protocol, basio::ip::port_type port) {
     try {
         acceptor_.open(protocol);
         acceptor_.set_option(basio_tcp::acceptor::reuse_address(true));

@@ -42,6 +42,8 @@ private:
     bool is_reading_;
     bool is_writing_;
     int id_;
+
+    const size_t MAX_PACKAGE_SIZE = 1024;
 };
 
 #endif // TCP_CONNECTION_H

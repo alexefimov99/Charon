@@ -50,22 +50,22 @@ private:
 class TcpServer : private TcpConnection::Observer {
 public:
     struct Observer {
-        // virtual void onConnectionAccepted(int connectionId);
-        // virtual void onReceived(int connectionId, const char *data, size_t size);
-        // virtual void onConnectionClosed(int connectionId);
+        // virtual void onConnectionAccepted(int connection_id);
+        // virtual void onReceived(int connection_id, const char *data, size_t size);
+        // virtual void onConnectionClosed(int connection_id);
     };
 
     TcpServer(basio::io_context &ioContext, Observer &observer);
 
-    bool listen(const basio_tcp &protocol, short port);
+    bool listen(const basio_tcp &protocol, basio::ip::port_type port);
     void startAcceptingConnections();
-    void send(int connectionId, const char *data, size_t size);
+    void send(int connection_id, const char *data, size_t size);
     void close();
 
 private:
     void accept();
-    void onReceived(int connectionId, const char *data, size_t size) override;
-    void onConnectionClosed(int connectionId) override;
+    void onReceived(int connection_id, const char *data, size_t size) override;
+    void onConnectionClosed(int connection_id) override;
 
     basio_tcp::acceptor acceptor_;
     std::unordered_map<int, std::shared_ptr<TcpConnection>> connections_;
