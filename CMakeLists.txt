@@ -1,20 +1,44 @@
 cmake_minimum_required(VERSION 3.10)
-project(CharonServer)
+project(charon)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-cmake_policy(SET CMP0167 NEW)
-find_package(Boost REQUIRED COMPONENTS system thread)
+option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 
-if(NOT Boost_FOUND)
-    message(FATAL_ERROR "Boost not found! Install Boost and try again.")
+find_package(Boost 1.66 REQUIRED COMPONENTS system thread)
+
+if(MSVC)
+    add_compile_options(/W4)
+    add_compile_definitions(_WIN32_WINNT=0x0601)
+    add_compile_definitions(_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING)
+else()
+    add_compile_options(-Wall -Wextra -pedantic)
 endif()
 
-include_directories(${Boost_INCLUDE_DIRS})
+add_executable(charon tcp_server.cpp)
 
-add_executable(CharonServer tcp_server.cpp tcp_connection.cpp)
-target_link_libraries(CharonServer Boost::system Boost::thread)
+target_include_directories(charon PRIVATE ${Boost_INCLUDE_DIRS})
+target_link_libraries(charon PRIVATE ${Boost_LIBRARIES})
 
-add_executable(CharonClient tcp_client.cpp tcp_connection.cpp)
-target_link_libraries(CharonClient Boost::system Boost::thread)
+if(UNIX)
+    find_package(Threads REQUIRED)
+    target_link_libraries(charon PRIVATE Threads::Threads)
+endif()
+
+install(TARGETS charon
+        RUNTIME DESTINATION bin)
+
+if(WIN32)
+    target_compile_definitions(charon PRIVATE _WIN32_WINNT=0x0601)
+endif()
+
+set(VERSION_MAJOR 1)
+set(VERSION_MINOR 0)
+set(VERSION_PATCH 0)
+
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/version.h
+)
+target_include_directories(charon PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
